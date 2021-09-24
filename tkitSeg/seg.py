@@ -118,7 +118,7 @@ class tkitSeg:
             # print(os.path.dirname(__file__))
             self.path=os.path.dirname(__file__)
             
-        print("self.path",self.path)
+        # print("self.path",self.path)
         self.model_path=os.path.join(self.path,"model_troch_export.onnx")
             
         self.tokenizer=BertTokenizer.from_pretrained(self.path)

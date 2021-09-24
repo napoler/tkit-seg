@@ -191,7 +191,7 @@
             <span class="c1"># print(os.path.dirname(__file__))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
             
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;self.path&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="c1"># print(&quot;self.path&quot;,self.path)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span><span class="s2">&quot;model_troch_export.onnx&quot;</span><span class="p">)</span>
             
         <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">=</span><span class="n">BertTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
