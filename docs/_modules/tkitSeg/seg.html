@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-cn" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tkitSeg.seg &mdash; tkitSeg 0.0.0.5  文档</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> tkitSeg
+          </a>
+              <div class="version">
+                0.0.0.5 
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="在文档中搜索" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div>
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Main">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../res/modules.html">tkitSeg</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" aria-label="Top" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">tkitSeg</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+<div role="navigation" aria-label="Breadcrumbs">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">模块代码</a> &raquo;</li>
+      <li>tkitSeg.seg</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>tkitSeg.seg 源代码</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">BertTokenizer</span>
+<span class="kn">import</span> <span class="nn">onnxruntime</span>
+<span class="kn">import</span> <span class="nn">onnx</span><span class="o">,</span><span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="c1"># import os</span>
+<span class="c1"># # tokenizer = BertTokenizer.from_pretrained(&quot;out/&quot;)</span>
+<span class="c1"># # tokenizer.save_pretrained(&quot;out&quot;)</span>
+<span class="c1"># # print(dir(tokenizer))</span>
+
+<span class="c1"># path =os.path.dirname(tkitSeg.__file__)</span>
+<span class="c1"># print(path)</span>
+<div class="viewcode-block" id="to_numpy"><a class="viewcode-back" href="../../res/tkitSeg.html#tkitSeg.seg.to_numpy">[文档]</a><span class="k">def</span> <span class="nf">to_numpy</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;[summary]</span>
+<span class="sd">    生成np数据</span>
+<span class="sd">    Args:</span>
+<span class="sd">        tensor ([type]): [description]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        [type]: [description]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span></div>
+<span class="c1"># def softmax(x):</span>
+
+<span class="c1">#     f_x = np.exp(x) / np.sum(np.exp(x))</span>
+<span class="c1">#     return f_x</span>
+
+
+<div class="viewcode-block" id="softmax"><a class="viewcode-back" href="../../res/tkitSeg.html#tkitSeg.seg.softmax">[文档]</a><span class="k">def</span> <span class="nf">softmax</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;[summary]</span>
+<span class="sd">    </span>
+<span class="sd">    转化成为概率</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x ([type]): [description]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        [type]: [description]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># returns max of each row and keeps same dims</span>
+    <span class="nb">max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">e_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="nb">max</span><span class="p">)</span>  <span class="c1"># subtracts each row with its max value</span>
+    <span class="c1"># returns sum of each row and keeps same dims</span>
+    <span class="nb">sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">e_x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">f_x</span> <span class="o">=</span> <span class="n">e_x</span> <span class="o">/</span> <span class="nb">sum</span>
+    <span class="nb">max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">f_x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<span class="c1"># def bulidToken_type_ids(attention_mask, Token_type=99):</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     构建新的类型矩阵</span>
+<span class="c1">#     Pytorch 替换tensor中大于某个值的所有元素</span>
+<span class="c1">#     https://blog.csdn.net/lxb206/article/details/103893961</span>
+
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     b = torch.full(list(attention_mask.size()), 99)</span>
+<span class="c1">#     out = torch.where(attention_mask &gt; 0, b, attention_mask)</span>
+<span class="c1">#     return out</span>
+
+
+
+
+
+<span class="c1"># np 批量修改</span>
+<span class="c1"># https://blog.csdn.net/lxb206/article/details/103893961</span>
+
+
+<div class="viewcode-block" id="tkitSeg"><a class="viewcode-back" href="../../res/tkitSeg.html#tkitSeg.seg.tkitSeg">[文档]</a><span class="k">class</span> <span class="nc">tkitSeg</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;[summary]</span>
+<span class="sd">    </span>
+<span class="sd">    分词和词性标注</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;./&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;zzz&#39;</span><span class="p">,</span><span class="s1">&#39;n&#39;</span><span class="p">,</span><span class="s1">&#39;t&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;s&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;f&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;m&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;q&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;b&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;r&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;v&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;a&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;z&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;d&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;p&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;c&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;u&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;y&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;e&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;o&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;i&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;j&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;h&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;k&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;g&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;x&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;w&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;nr&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;ns&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;nt&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;nx&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;nz&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;vd&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;vn&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;vx&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;ad&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;an&#39;</span><span class="p">]</span>
+        <span class="c1"># path =os.path.dirname(tkitSeg.__file__)</span>
+        
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="s2">&quot;model_troch_export.onnx&quot;</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">=</span><span class="n">path</span>
+            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># print(os.path.dirname(__file__))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+            
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;self.path&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span><span class="s2">&quot;model_troch_export.onnx&quot;</span><span class="p">)</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">=</span><span class="n">BertTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loadModel</span><span class="p">()</span>
+        <span class="k">pass</span>
+<div class="viewcode-block" id="tkitSeg.loadModel"><a class="viewcode-back" href="../../res/tkitSeg.html#tkitSeg.seg.tkitSeg.loadModel">[文档]</a>    <span class="k">def</span> <span class="nf">loadModel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;[summary]</span>
+<span class="sd">        </span>
+<span class="sd">        加载训练的模型</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">ort_session</span> <span class="o">=</span> <span class="n">onnxruntime</span><span class="o">.</span><span class="n">InferenceSession</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ort_session</span><span class="o">.</span><span class="n">get_providers</span><span class="p">()</span>
+        <span class="n">onnx_model</span> <span class="o">=</span> <span class="n">onnx</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_path</span><span class="p">)</span>
+        <span class="n">onnx</span><span class="o">.</span><span class="n">checker</span><span class="o">.</span><span class="n">check_model</span><span class="p">(</span><span class="n">onnx_model</span><span class="p">)</span></div>
+<div class="viewcode-block" id="tkitSeg.prediction"><a class="viewcode-back" href="../../res/tkitSeg.html#tkitSeg.seg.tkitSeg.prediction">[文档]</a>    <span class="k">def</span> <span class="nf">prediction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">textLIst</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;[summary]</span>
+<span class="sd">        </span>
+<span class="sd">        批量标注词性和分词</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            textLIst ([type]): [description]</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [type]: [description]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">inputData</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span><span class="n">textLIst</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;max_length&quot;</span><span class="p">,</span>
+                            <span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># print(&quot;out&quot;,out)</span>
+        <span class="c1"># compute ONNX Runtime output prediction</span>
+
+        <span class="n">token_type_ids</span> <span class="o">=</span> <span class="n">to_numpy</span><span class="p">(</span><span class="n">inputData</span><span class="p">[</span><span class="s2">&quot;attention_mask&quot;</span><span class="p">])</span>
+        <span class="c1"># print()</span>
+        <span class="n">token_type_ids</span><span class="p">[</span><span class="n">token_type_ids</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">ort_inputs</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ort_session</span><span class="o">.</span><span class="n">get_inputs</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">to_numpy</span><span class="p">(</span><span class="n">inputData</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">ort_session</span><span class="o">.</span><span class="n">get_inputs</span><span class="p">(</span>
+        <span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">token_type_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ort_session</span><span class="o">.</span><span class="n">get_inputs</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">to_numpy</span><span class="p">(</span><span class="n">inputData</span><span class="p">[</span><span class="s2">&quot;attention_mask&quot;</span><span class="p">])}</span>
+
+        <span class="c1"># print(ort_inputs)</span>
+        <span class="n">ort_outs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ort_session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">ort_inputs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ort_outs</span><span class="p">,</span> <span class="n">inputData</span></div>
+    
+    
+<div class="viewcode-block" id="tkitSeg.autoSeg"><a class="viewcode-back" href="../../res/tkitSeg.html#tkitSeg.seg.tkitSeg.autoSeg">[文档]</a>    <span class="k">def</span> <span class="nf">autoSeg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">textLIst</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;[summary]</span>
+<span class="sd">        </span>
+<span class="sd">        自动批量标注词性，分词，最大同时处理24条</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            textLIst ([type]): [description]</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [type]: [description]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">datas</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">orlen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">textLIst</span><span class="p">)</span>
+        <span class="n">textLIst</span> <span class="o">=</span> <span class="p">(</span><span class="n">textLIst</span><span class="o">*</span><span class="mi">24</span><span class="p">)[:</span><span class="mi">24</span><span class="p">]</span>
+        <span class="n">ort_outs</span><span class="p">,</span> <span class="n">inputData</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prediction</span><span class="p">(</span><span class="n">textLIst</span><span class="p">)</span>
+
+        <span class="c1"># onnx推理结果</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">ort_outs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">outType</span> <span class="o">=</span> <span class="n">ort_outs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">indexp</span><span class="p">,</span> <span class="n">typeList</span><span class="p">,</span> <span class="n">wd</span><span class="p">,</span> <span class="n">attention_mask</span><span class="p">,</span> <span class="n">text</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span> <span class="n">outType</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span> <span class="n">inputData</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">],</span> <span class="n">inputData</span><span class="p">[</span><span class="s2">&quot;attention_mask&quot;</span><span class="p">],</span> <span class="n">textLIst</span><span class="p">[:</span><span class="n">orlen</span><span class="p">]):</span>
+            <span class="c1"># print(indexp,typeList,wd,attention_mask )</span>
+            <span class="n">one</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">words</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">convert_ids_to_tokens</span><span class="p">(</span><span class="n">wd</span><span class="p">)</span>
+            <span class="c1"># print(indexp)</span>
+            <span class="n">wordList</span><span class="o">=</span><span class="p">[]</span>
+            <span class="n">p</span><span class="o">=</span><span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">pi</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">indexp</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">typeList</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">words</span><span class="p">,</span> <span class="n">attention_mask</span><span class="p">)):</span>
+                
+                <span class="k">if</span> <span class="n">mask</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    
+                    <span class="k">if</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">p</span><span class="p">:</span>
+                        <span class="c1"># print(&quot;漏掉&quot;)</span>
+                        <span class="k">continue</span>
+                        <span class="k">pass</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># print(&quot;漏掉&quot;)</span>
+                        <span class="k">pass</span>
+                    <span class="c1"># print(i,i+pi,p)</span>
+                    <span class="c1"># print(words[i:i+pi])</span>
+
+                    <span class="n">p</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="n">pi</span>
+                    
+
+                    <span class="n">outword</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">ww</span> <span class="ow">in</span> <span class="n">words</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">pi</span><span class="p">]:</span>
+                        <span class="n">outword</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ww</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;##&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                            <span class="s2">&quot;[PAD]&quot;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;[SEP]&quot;</span><span class="p">,</span> <span class="s1">&#39; </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">outword</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">one</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;word&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outword</span><span class="p">),</span> <span class="s2">&quot;wtype&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="n">t</span><span class="p">]})</span>
+                        <span class="n">wordList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outword</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="n">datas</span><span class="o">.</span><span class="n">append</span><span class="p">(({</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">text</span><span class="p">,</span> <span class="s2">&quot;pos&quot;</span><span class="p">:</span> <span class="n">one</span><span class="p">,</span><span class="s2">&quot;seg&quot;</span><span class="p">:</span><span class="n">wordList</span><span class="p">}))</span>
+        <span class="k">return</span> <span class="n">datas</span></div></div>
+
+
+<span class="c1"># # 使用示例</span>
+
+<span class="c1"># text = [&quot; 张杨，男，汉族，黑龙江双城人，1988年2月6日生于贵州省贵阳市&quot;, &quot; 自学习结合部分句法分析的汉语词性标注&quot;]</span>
+
+<span class="c1"># Seg=tkitSeg()</span>
+<span class="c1"># datas = Seg.autoSeg(text)</span>
+<span class="c1"># print(datas)</span>
+
+</pre></div>
+
+           </div>
+
+
+           <div id="lv-container" data-id="city" data-uid="MTAyMC80OTg1OS8yNjM1MA==">
+            <script type="4097e126b712b9dab1f8fc00-text/javascript">
+                 (function(d, s) {
+                     var j, e = d.getElementsByTagName(s)[0];
+              
+                     if (typeof LivereTower === 'function') { return; }
+              
+                     j = d.createElement(s);
+                     j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+                     j.async = true;
+              
+                     e.parentNode.insertBefore(j, e);
+                 })(document, 'script');
+              </script>
+            <noscript>为正常使用来必力评论功能请激活JavaScript</noscript>        
+
+            
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2021, Terry Chan.</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用了 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a>开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
