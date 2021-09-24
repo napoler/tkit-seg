@@ -1,9 +1,9 @@
-name='tkitDemo'#修改包名字-
-version='0.0.0.2 '
-description='Terry toolkit tkitDemo'
+name='tkitSeg'#修改包名字-
+version='0.0.0.5 '
+description='Terry toolkit tkitSeg,一个中文分词和词性标注工具'
 author='Terry Chan'
 author_email='napoler2008@gmail.com'
-url='http://www.terrychan.org/python_libs_demo/'
+url='https://docs.terrychan.org/tkit-seg/'
 
 copyright = '2021, Terry Chan'
 language = 'zh_cn'
